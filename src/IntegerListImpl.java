@@ -1,4 +1,3 @@
-import exception.ArrayIntegerIsFullException;
 import exception.ElementNonFoundException;
 import exception.InvalidIndexException;
 import exception.ItemIsNullException;
@@ -6,7 +5,7 @@ import exception.ItemIsNullException;
 import java.util.Arrays;
 
 public class IntegerListImpl implements IntegerList {
-    private final Integer[] arrayInteger;
+    private Integer[] arrayInteger;
     private int size;
 
     public IntegerListImpl() {
@@ -136,7 +135,7 @@ public class IntegerListImpl implements IntegerList {
 
     private void validateSize() {
         if (size == arrayInteger.length) {
-            throw new ArrayIntegerIsFullException();
+            grow();
         }
     }
 
@@ -146,61 +145,41 @@ public class IntegerListImpl implements IntegerList {
         }
     }
 
+    private void grow(){
+        arrayInteger = Arrays.copyOf(arrayInteger, size+size/2);
+    }
+
+    public void sort(Integer[] arrayInteger){
+        quickSort(arrayInteger, 0, arrayInteger.length-1);
+    }
+
+    public static void quickSort(Integer[] arr, int begin, int end) {
+        if (begin < end) {
+            int partitionIndex = partition(arr, begin, end);
+
+            quickSort(arr, begin, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, end);
+        }
+    }
+
+    private static int partition(Integer[] arr, int begin, int end) {
+        int pivot = arr[end];
+        int i = (begin - 1);
+
+        for (int j = begin; j < end; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+
+                swapElements(arr, i, j);
+            }
+        }
+        swapElements(arr, i + 1, end);
+        return i + 1;
+    }
+
     private static void swapElements(Integer[] arr, int indexA, int indexB) {
         int tmp = arr[indexA];
         arr[indexA] = arr[indexB];
         arr[indexB] = tmp;
-    }
-
-    public static void sortBubble(Integer[] arr) {                  //пузырьковая сортировка
-        for (int i = 0; i < arr.length - 1; i++) {
-            for (int i1 = 0; i1 < arr.length - 1 - i; i1++) {
-                if (arr[i1] > arr[i1+1]) {
-                    swapElements(arr, i1, i1 + 1);
-                }
-            }
-        }
-    }
-
-    public static void sortSelection(Integer[] arr) {                   //сортировка выбором
-        for (int i = 0; i < arr.length - 1; i++) {
-            int minElementIndex = i;
-            for (int j = arr.length-1; j >= i; j--) {
-                if (arr[j] < arr[minElementIndex]) {
-                    minElementIndex = j;
-                }
-                swapElements(arr, i, minElementIndex);
-            }
-        }
-    }
-
-
-    public static void sortInsertion(Integer[] arr) {               //сортировка вставкой
-        for (int i = 1; i < arr.length; i++) {
-            int temp = arr[i];
-            int j = i;
-            while (j > 0 && arr[j - 1] >= temp) {
-                arr[j] = arr[j - 1];
-                j--;
-            }
-            arr[j] = temp;
-        }
-    }
-
-    public static boolean binarySearch(Integer[] arr, Integer element){
-       int min = 0;
-       int max = arr.length-1;
-       while(min<=max){
-           int mid = (min+max)/2;
-           if(element==arr[mid]){
-               return true;
-           }
-           if(element>arr[mid]){
-               min=mid+1;
-           } else {
-               max=mid-1;
-           }
-       }
-       return false;
     }
 }
